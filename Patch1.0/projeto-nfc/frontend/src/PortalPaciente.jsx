@@ -3,21 +3,20 @@ import { useParams } from 'react-router-dom'; // Pega o ID da URL
 import axios from 'axios'; // Para chamar nossa API Flask
 
 // Define a URL da nossa API.
-// O React roda na porta 5173, o Flask na 5000.
 const API_URL = 'http://127.0.0.1:5000/api';
 
 function PortalPaciente() {
   // 1. Estados
-  const { userId } = useParams(); // Pega o ID da URL (ex: 7aLpQcR2bX...)
+  const { userId } = useParams(); // Pega o ID da URL
 
   const [infoPublica, setInfoPublica] = useState(null);
-  const [dadosPrivados, setDadosPrivados] = useState(null);
+  const [dadosPrivados, setDadosPrivados] = useState(null); // Agora vai conter tudo o que é privado
 
   const [pin, setPin] = useState('');
   const [estaBloqueado, setEstaBloqueado] = useState(true);
   const [erro, setErro] = useState(''); // Para mensagens de erro
 
-  // 2. Efeito de Carregamento (Busca dados públicos)
+  // 2. Efeito de Carregamento (Busca dados públicos - agora, SÓ O NOME)
   useEffect(() => {
     // Esta função roda assim que o componente é carregado
     const fetchPublicInfo = async () => {
@@ -25,7 +24,7 @@ function PortalPaciente() {
         setErro('');
         // Chama a rota pública do Flask
         const res = await axios.get(`${API_URL}/public-info/${userId}`);
-        setInfoPublica(res.data);
+        setInfoPublica(res.data); // 'res.data' agora contém apenas { nome: "..." }
       } catch (err) {
         setErro('Erro: Usuário não encontrado ou API offline.');
         console.error(err);
@@ -36,13 +35,16 @@ function PortalPaciente() {
   }, [userId]); // Roda de novo se o userId mudar
 
   // 3. Funções de Ação
+  
+  // FUNÇÃO ATUALIZADA: Agora usa 'dadosPrivados'
   const handleLigarEmergencia = () => {
-    if (infoPublica && infoPublica.contatoEmergencia) {
-      // Isso tenta abrir o discador do celular
-      window.location.href = `tel:${infoPublica.contatoEmergencia}`;
+    // Verifica se 'dadosPrivados' existe antes de tentar ler
+    if (dadosPrivados && dadosPrivados.contatoEmergencia) {
+      window.location.href = `tel:${dadosPrivados.contatoEmergencia}`;
     }
   };
 
+  // Função de Desbloqueio (sem alteração)
   const handleUnlock = async (e) => {
     e.preventDefault(); // Impede o formulário de recarregar a página
     setErro('');
@@ -56,7 +58,8 @@ function PortalPaciente() {
 
       // O Flask responde com { success: true, data: {...} }
       if (res.data.success) {
-        setDadosPrivados(res.data.data);
+        // 'res.data.data' agora contém { tipoSanguineo, alergias, contatoEmergencia, ... }
+        setDadosPrivados(res.data.data); 
         setEstaBloqueado(false); // Desbloqueia!
       }
     } catch (err) {
@@ -65,6 +68,11 @@ function PortalPaciente() {
       console.error(err);
     }
   };
+
+  const handleLock = () => {
+      setEstaBloqueado(true); // Simplesmente diz ao React para voltar ao estado bloqueado
+      setPin('');             // Limpa o campo do PIN para a próxima vez
+    };
 
   // 4. Renderização (O que aparece na tela)
 
@@ -77,26 +85,21 @@ function PortalPaciente() {
   if (erro && !infoPublica) {
     return <div className="container erro">{erro}</div>;
   }
-
+  
   // --- Tela Principal (Bloqueada ou Desbloqueada) ---
   return (
     <div className="container">
-      {/* Mostra o nome do paciente (dado público) */}
+      {/* Mostra o nome do paciente (dado público - sempre visível) */}
       <h2>{infoPublica.nome}</h2>
       <hr />
 
-      {/* Botão de Emergência (sempre visível) */}
-      <button className="btn-emergencia" onClick={handleLigarEmergencia}>
-        Ligar para Contato de Emergência
-      </button>
-
       {/* --- Divisão: Bloqueado vs Desbloqueado --- */}
-
+      
       {estaBloqueado ? (
-        // 4a. Se estiver BLOQUEADO, mostra o formulário de PIN
+        // 4a. Se estiver BLOQUEADO, mostra SÓ o formulário de PIN
         <div className="bloqueado">
           <h3>Acesso Restrito</h3>
-          <p>Insira o PIN para ver as informações médicas.</p>
+          <p>Insira o PIN para ver as informações.</p>
           <form onSubmit={handleUnlock}>
             <input 
               type="password" 
@@ -113,14 +116,30 @@ function PortalPaciente() {
         </div>
 
       ) : (
-        // 4b. Se estiver DESBLOQUEADO, mostra os dados privados
+        // 4b. Se estiver DESBLOQUEADO, mostra TUDO
         <div className="desbloqueado">
+          
+          {/* Botão de Emergência agora SÓ aparece aqui */}
+          <button className="btn-emergencia" onClick={handleLigarEmergencia}>
+            Ligar para Contato de Emergência
+          </button>
+
           <h3>Informações Médicas</h3>
           <div className="info-grid">
+            {/* Informações antigas e NOVOS CAMPOS */}
             <p><strong>Tipo Sanguíneo:</strong> {dadosPrivados.tipoSanguineo}</p>
             <p><strong>Alergias:</strong> {dadosPrivados.alergias}</p>
-            {/* Adicione mais campos aqui conforme sua struct no Firebase */}
+            <p><strong>Medicamentos:</strong> {dadosPrivados.medicamentosUsoContinuo}</p>
+            <p><strong>Histórico Médico:</strong> {dadosPrivados.historico}</p>
+            
+            {/* Você pode adicionar quantos campos quiser aqui */}
+            {/* Apenas garanta que 'dadosPrivados.NOME_DO_CAMPO' 
+                corresponda ao que está no Firebase */}
           </div>
+          <hr />
+          <button className="btn-bloquear" onClick={handleLock}>
+            Bloquear Tela
+          </button>
         </div>
       )}
     </div>
