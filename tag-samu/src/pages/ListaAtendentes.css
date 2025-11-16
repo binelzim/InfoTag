@@ -1,0 +1,241 @@
+.atendentes-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.atendentes-container h1 {
+  color: white;
+  margin-bottom: 10px;
+  font-size: 32px;
+}
+
+.subtitulo {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  margin: 0;
+}
+
+.loading {
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.sem-dados-container {
+  max-width: 600px;
+  margin: 60px auto;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+.sem-dados-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.sem-dados-container h2 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.sem-dados-container p {
+  color: #666;
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.dica {
+  color: #888;
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 30px !important;
+}
+
+.btn-registro {
+  padding: 14px 32px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-registro:hover {
+  background: #5568d3;
+}
+
+.atendentes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+}
+
+.atendente-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.atendente-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.atendente-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.atendente-card h3 {
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.funcao {
+  color: #666;
+  margin-bottom: 5px;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.registro {
+  color: #888;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+
+.atendente-card button {
+  background: #27ae60;
+  padding: 12px 32px;
+  width: 100%;
+  max-width: 200px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.atendente-card button:hover {
+  background: #229954;
+}
+
+.acoes-footer {
+  display: flex;
+  gap: 15px;
+  max-width: 800px;
+  margin: 40px auto 0;
+  flex-wrap: wrap;
+}
+
+.btn-cadastro,
+.btn-secundario {
+  flex: 1;
+  min-width: 250px;
+  padding: 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cadastro {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-cadastro:hover {
+  background: #e67e22;
+}
+
+.btn-secundario {
+  background: white;
+  color: #667eea;
+  border: 2px solid white;
+}
+
+.btn-secundario:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.erro {
+  color: #e74c3c;
+  background: #fadbd8;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 0 auto 20px;
+  text-align: center;
+  max-width: 600px;
+}
+
+@media (max-width: 768px) {
+  .atendentes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .acoes-footer {
+    flex-direction: column;
+  }
+  
+  .btn-cadastro,
+  .btn-secundario {
+    min-width: 100%;
+  }
+}
