@@ -1,0 +1,266 @@
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.5s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container h2 {
+  color: #1e3c72;
+  margin-top: 0;
+  font-size: 1.8em;
+}
+
+.container h3 {
+  color: #1976d2;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.container hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+  margin: 1.5rem 0;
+}
+
+.container p {
+  color: #424242;
+  line-height: 1.7;
+}
+
+.container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.container input, .container textarea, .container select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: inherit;
+  background-color: #fafafa;
+  color: #1e3c72;
+  transition: all 0.3s ease;
+}
+
+.container input:focus, .container textarea:focus, .container select:focus {
+  outline: none;
+  border-color: #42a5f5;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+}
+
+.container button {
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(66, 165, 245, 0.3);
+}
+
+.container button:hover {
+  background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+  transform: translateY(-2px);
+}
+
+.container button:active {
+  transform: translateY(0);
+}
+
+.bloqueado {
+  text-align: center;
+}
+
+.bloqueado h3 {
+  color: #d32f2f;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.bloqueado p {
+  color: #666;
+  margin: 1rem 0;
+  font-size: 1.05em;
+}
+
+.bloqueado form {
+  max-width: 300px;
+  margin: 1.5rem auto;
+}
+
+.bloqueado input {
+  text-align: center;
+  font-size: 1.2em;
+  letter-spacing: 0.2em;
+}
+
+.desbloqueado {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.btn-emergencia {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.05em;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-emergencia:hover {
+  background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-bloquear {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(100, 181, 246, 0.3);
+}
+
+.btn-bloquear:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+  transform: translateY(-2px);
+}
+
+.info-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.info-grid p {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-left: 4px solid #42a5f5;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.info-grid strong {
+  color: #1e3c72;
+}
+
+.lista-itens {
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-left: 4px solid #42a5f5;
+  border-radius: 4px;
+}
+
+.lista-itens strong {
+  display: block;
+  color: #1e3c72;
+  margin-bottom: 0.75rem;
+}
+
+.lista-itens ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: none;
+}
+
+.lista-itens li {
+  padding: 0.5rem 0;
+  color: #424242;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.lista-itens li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #42a5f5;
+  font-weight: bold;
+}
+
+.erro, .erro-pin {
+  padding: 1rem;
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #d32f2f;
+  border-radius: 4px;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .container h2 {
+    font-size: 1.5em;
+  }
+
+  .container h3 {
+    font-size: 1.1em;
+  }
+
+  .info-grid {
+    gap: 1rem;
+  }
+
+  .info-grid p, .lista-itens {
+    padding: 0.75rem;
+  }
+}
