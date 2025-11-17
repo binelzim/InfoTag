@@ -4,7 +4,7 @@ import axios from 'axios';
 import './PortalPaciente.css';
 
 // Define a URL da nossa API.
-const API_URL = 'http://127.0.0.1:5000/api';
+const API_URL = 'https://info-tag-backend.onrender.com/api';
 
 function PortalPaciente() {
   // 1. Estados
