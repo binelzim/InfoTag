@@ -4,7 +4,7 @@ import { auth } from './firebaseConfig';
 import { useNavigate } from 'react-router-dom'; // useNavigate para os botões
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:5000/api';
+const API_URL = 'https://info-tag-backend.onrender.com/api';
 
 function Dashboard() {
   const navigate = useNavigate();
