@@ -6,6 +6,7 @@ serviceAccountKey.json
 __pycache__/
 .DS_Store
 dist/
+public/
 .vite/
 *.log
 .firebase/
