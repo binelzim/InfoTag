@@ -1,0 +1,326 @@
+.userform-container {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.5s ease-out;
+}
+
+.userform-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.userform-back-button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.userform-back-button:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  transform: translateY(-1px);
+}
+
+.userform-header h2 {
+  color: #1e3c72;
+  margin: 0;
+  font-size: 1.8em;
+  flex: 1;
+}
+
+.userform-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #42a5f5;
+}
+
+.form-section h3 {
+  color: #1e3c72;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1em;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  color: #1e3c72;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.userform-form input,
+.userform-form textarea {
+  padding: 1rem 1.1rem;
+  border: 2px solid #e8ecf1;
+  border-radius: 12px;
+  font-size: 1em;
+  font-family: inherit;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #1e3c72;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(66, 165, 245, 0.08);
+}
+
+.userform-form input:focus,
+.userform-form textarea:focus {
+  outline: none;
+  border-color: #42a5f5;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+  box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.15), 0 8px 25px rgba(66, 165, 245, 0.2);
+  transform: translateY(-2px);
+}
+
+.userform-form input::placeholder,
+.userform-form textarea::placeholder {
+  color: #a0aec0;
+}
+
+.userform-form textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+.allergies-list, .medications-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f7ff;
+  border-radius: 6px;
+  border-left: 3px solid #42a5f5;
+}
+
+.allergies-list h4, .medications-list h4 {
+  color: #1e3c72;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 0.95em;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9em;
+  color: #424242;
+}
+
+.item-list li:last-child {
+  margin-bottom: 0;
+}
+
+.btn-remove-item {
+  padding: 0.3rem 0.6rem;
+  background-color: #ef5350;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-remove-item:hover {
+  background-color: #e53935;
+}
+
+.add-item-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.add-item-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+.add-item-button {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-item-button:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+}
+
+.userform-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn-save {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(100, 181, 246, 0.3);
+}
+
+.btn-cancel:hover {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+  transform: translateY(-2px);
+}
+
+.userform-error {
+  padding: 1rem;
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #d32f2f;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.userform-success {
+  padding: 1rem;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #4caf50;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .userform-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .userform-actions {
+    flex-direction: column;
+  }
+
+  .btn-save, .btn-cancel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .userform-container {
+    padding: 1rem;
+  }
+
+  .userform-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .userform-header h2 {
+    font-size: 1.3em;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .userform-form input,
+  .userform-form textarea {
+    font-size: 16px;
+  }
+}

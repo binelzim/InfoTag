@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+serviceAccountKey.json
+*.pyc
+__pycache__/
+.DS_Store
+dist/
+.vite/
+*.log
+.firebase/
+.firebaserc
+*.swp
+*.swo
+*~
