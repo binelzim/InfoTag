@@ -16,4 +16,4 @@ COPY backend/app.py backend/demo.py ./backend/
 COPY --from=frontend-build /build/dist ./frontend/dist
 USER infotag
 EXPOSE 10000
-CMD ["sh", "-c", "exec gunicorn --chdir backend --bind 0.0.0.0:${PORT:-10000} --workers 1 --threads 4 --timeout 45 app:app"]
+CMD ["sh", "-c", "exec gunicorn --chdir backend --bind 0.0.0.0:${PORT:-10000} --workers 1 --threads 4 --timeout 45 --no-control-socket app:app"]
