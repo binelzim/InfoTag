@@ -1,0 +1,12 @@
+*
+!backend/
+!backend/app.py
+!backend/demo.py
+!backend/requirements.txt
+!frontend/
+!frontend/index.html
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/vite.config.js
+!frontend/src/
+!frontend/src/**

@@ -1,115 +1,188 @@
-import React, { useState, useEffect } from 'react';
-import { signOut } from "firebase/auth";
-import { auth } from './firebaseConfig';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from './api';
-import './Dashboard.css';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useOutletContext } from 'react-router-dom';
+import { errorMessage, statusOf } from './api';
+import { adminRequest } from './firebaseConfig';
+import { Icon, Loading, Notice, PersonMark } from './Interface';
 
-function Dashboard() {
-  const navigate = useNavigate();
-  const [view, setView] = useState('users'); 
-  const [dataList, setDataList] = useState([]); 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+const collator = new Intl.Collator('pt-BR', { sensitivity: 'base' });
+const normalize = (value) => value.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const user = auth.currentUser;
-      if (!user) return;
-      const token = await user.getIdToken();
-      const endpoint = view === 'users' ? '/admin/users' : '/admin/responders';
-      const res = await axios.get(`${API_URL}${endpoint}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      setDataList(res.data);
-    } catch (err) {
-      setError('Erro ao carregar dados. Verifique a conexão.');
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function Dashboard() {
+  const { mode } = useOutletContext();
+  const location = useLocation();
+  const responders = new URLSearchParams(location.search).get('tab') === 'socorristas';
+  const kind = responders ? 'responder' : 'user';
+  const group = responders ? 'responders' : 'patients';
+  const [records, setRecords] = useState(null);
+  const [loadError, setLoadError] = useState(null);
+  const [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState({ group: '', value: '' });
+  const [copy, setCopy] = useState(null);
+  const [selection, setSelection] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const dialog = useRef(null);
 
   useEffect(() => {
-    fetchData();
-    setSearchTerm('');
-  }, [view]);
+    const controller = new AbortController();
+    const options = { signal: controller.signal };
+    Promise.all([adminRequest('/admin/users', options), adminRequest('/admin/responders', options)])
+      .then(([patients, responderList]) => {
+        if (!controller.signal.aborted) setRecords({ patients, responders: responderList });
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setLoadError({ message: errorMessage(error), status: statusOf(error) });
+      });
+    return () => controller.abort();
+  }, [refresh]);
 
-  const handleLogout = async () => {
-    if (window.confirm("Tem certeza que deseja sair do sistema?")) {
-      await signOut(auth);
-      navigate('/login');
-    }
-  };
+  const searchValue = search.group === group ? search.value : '';
+  const term = normalize(searchValue.trim());
+  const nameOf = (item) => (responders ? item.nome : item.infoPublica?.nome) || 'Nome não informado';
+  const visible = (records?.[group] || [])
+    .filter((item) => normalize([nameOf(item), item.email, item.documento, item.id].filter(Boolean).join(' ')).includes(term))
+    .sort((first, second) => collator.compare(nameOf(first), nameOf(second)));
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Deletar ${name}? Esta ação é irreversível.`)) return;
+  async function copyLink(id) {
+    const link = new URL('/portal/' + id, window.location.origin).href;
     try {
-        const token = await auth.currentUser.getIdToken();
-        const endpoint = view === 'users' ? `/admin/user/${id}` : `/admin/responder/${id}`;
-        await axios.delete(`${API_URL}${endpoint}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setDataList(dataList.filter(item => item.id !== id));
-    } catch (err) {
-        alert('Erro ao deletar: ' + (err.response?.data?.error || err.message));
+      await navigator.clipboard.writeText(link);
+      setCopy({ message: 'Link copiado. Grave este endereço na tag NFC.' });
+    } catch {
+      setCopy({ message: 'Selecione e copie o endereço da tag.', link });
     }
-  };
+  }
 
-  const filteredList = dataList.filter((item) => {
-    const term = searchTerm.toLowerCase();
-    const name = (item.nome || item.infoPublica?.nome || '').toLowerCase();
-    const extra = (item.email || item.id || '').toLowerCase();
-    return name.includes(term) || extra.includes(term);
-  });
+  function askDelete(item) {
+    setSelection({ id: item.id, name: nameOf(item), kind, group });
+    setDeleteError('');
+    dialog.current.showModal();
+  }
+
+  async function confirmDelete() {
+    if (!selection) return;
+    setDeleting(true);
+    try {
+      await adminRequest('/admin/' + selection.kind + '/' + selection.id, { method: 'DELETE' });
+      setRecords((previous) => ({
+        ...previous,
+        [selection.group]: previous[selection.group].filter((item) => item.id !== selection.id),
+      }));
+      dialog.current.close();
+    } catch (error) {
+      setDeleteError(errorMessage(error, 'Não foi possível excluir o cadastro.'));
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  const message = location.state?.message;
+  const newId = location.state?.newPatientId;
+  const label = responders ? 'Socorristas' : 'Pacientes';
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h2>Dashboard Admin</h2>
-        <button onClick={handleLogout} className="btn-logout">Sair</button>
+    <>
+      <div className="workspace-heading">
+        <div><h1>Painel de gestão</h1><p>Organize pacientes, links de tags NFC e contas de socorristas.</p></div>
+        <Link className="button button-primary" to={'/admin/' + kind + '/new'}>
+          <Icon name="plus" /> {responders ? 'Cadastrar socorrista' : 'Cadastrar paciente'}
+        </Link>
       </div>
 
-      <div style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
-          <button onClick={() => setView('users')} style={{flex: 1, padding: '12px', background: view === 'users' ? '#1e3c72' : '#e0e0e0', color: view === 'users' ? 'white' : '#555', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.3s ease'}}>Pacientes</button>
-          <button onClick={() => setView('responders')} style={{flex: 1, padding: '12px', background: view === 'responders' ? '#d32f2f' : '#e0e0e0', color: view === 'responders' ? 'white' : '#555', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.3s ease'}}>Socorristas</button>
-      </div>
-      
-      <div className="dashboard-controls">
-          <button className="btn-add-user" onClick={() => navigate(view === 'users' ? '/admin/user/new' : '/admin/responder/new')} style={{background: view === 'responders' ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)' : undefined}}>+ Adicionar {view === 'users' ? 'Paciente' : 'Socorrista'}</button>
-          <input type="text" className="dashboard-search" placeholder={view === 'users' ? "Pesquisar paciente..." : "Pesquisar socorrista..."} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-      </div>
-
-      {loading ? <p className="loading-message">Carregando dados...</p> : (
-        <div className="dashboard-table-wrapper">
-            <table className="dashboard-table">
-            <thead>
-                <tr><th>Nome</th><th>{view === 'users' ? 'ID (NFC)' : 'Identificação / E-mail'}</th><th>Ações</th></tr>
-            </thead>
-            <tbody>
-                {filteredList.map((item) => (
-                <tr key={item.id}>
-                    <td><strong style={{color: '#1e3c72'}}>{view === 'users' ? item.infoPublica?.nome : item.nome}</strong></td>
-                    <td>{view === 'users' ? (<span style={{fontFamily: 'monospace', background: '#f5f5f5', padding: '4px 8px', borderRadius: '4px'}}>{item.id}</span>) : (<div><div>{item.email}</div><small style={{color:'#666'}}>{item.documento}</small></div>)}</td>
-                    <td>
-                    <div className="dashboard-actions">
-                        <button className="btn-edit" onClick={() => {if (view === 'users') {navigate(`/admin/user/edit/${item.id}`);} else {navigate(`/admin/responder/edit/${item.id}`);}}}>Editar</button>
-                        <button className="btn-delete" onClick={() => handleDelete(item.id, view === 'users' ? item.infoPublica?.nome : item.nome)}>Deletar</button>
-                    </div>
-                    </td>
-                </tr>
-                ))}
-                {filteredList.length === 0 && !loading && (<tr><td colSpan="3" style={{textAlign:'center', padding:'30px', color: '#888'}}>Nenhum registro encontrado.</td></tr>)}
-            </tbody>
-            </table>
-        </div>
+      {message && (
+        <Notice type="success">
+          {message}{' '}
+          {newId && <Link className="text-link" to={'/portal/' + newId}>Abrir portal criado</Link>}
+        </Notice>
       )}
-      {error && <p className="error-message">{error}</p>}
-    </div>
+
+      <div className="metrics">
+        <Link to="/admin/dashboard" className="metric surface">
+          <span className="section-icon"><Icon name="person" /></span>
+          <div><span>Pacientes cadastrados</span><strong>{records?.patients.length ?? '–'}</strong></div>
+        </Link>
+        <Link to="/admin/dashboard?tab=socorristas" className="metric surface">
+          <span className="section-icon"><Icon name="plus" /></span>
+          <div><span>Socorristas cadastrados</span><strong>{records?.responders.length ?? '–'}</strong></div>
+        </Link>
+      </div>
+
+      <section className="records surface" aria-labelledby="records-heading">
+        <div className="records-header">
+          <h2 id="records-heading">{label}</h2>
+          <label className="search-field">
+            <Icon name="search" /><span className="visually-hidden">Buscar {label.toLowerCase()}</span>
+            <input
+              type="search"
+              value={searchValue}
+              onChange={(event) => setSearch({ group, value: event.target.value })}
+              placeholder={responders ? 'Buscar por nome ou e-mail' : 'Buscar por nome ou ID'}
+            />
+          </label>
+        </div>
+        {copy && (
+          <Notice type="success">
+            {copy.message}
+            {copy.link && <input className="copy-link-input" aria-label="Link da tag" value={copy.link} readOnly onFocus={(event) => event.target.select()} />}
+          </Notice>
+        )}
+        {loadError ? (
+          <div className="records-state">
+            <Notice type="error">{loadError.message}</Notice>
+            {loadError.status === 401 || loadError.status === 403 ? (
+              <Link className="button button-outline" to="/login">Voltar ao login</Link>
+            ) : (
+              <button className="button button-outline" onClick={() => { setLoadError(null); setRefresh(refresh + 1); }}>
+                Tentar novamente
+              </button>
+            )}
+          </div>
+        ) : !records ? <div className="records-state"><Loading>Carregando cadastros…</Loading></div> : visible.length === 0 ? (
+          <p className="empty-state">{term ? 'Nenhum cadastro corresponde à busca.' : 'Ainda não há cadastros nesta lista.'}</p>
+        ) : (
+          <div className="table-wrapper">
+            <table className="records-table">
+              <thead><tr><th scope="col">Nome</th><th scope="col">{responders ? 'Conta' : 'Identificador NFC'}</th><th scope="col">Ações</th></tr></thead>
+              <tbody>
+                {visible.map((item) => (
+                  <tr key={item.id}>
+                    <td><span className="table-person"><PersonMark name={nameOf(item)} /><strong>{nameOf(item)}</strong></span></td>
+                    <td>
+                      {responders
+                        ? <span className="account-cell">{item.email}{item.documento && <small>{item.documento}</small>}</span>
+                        : <code className="identifier">{item.id}</code>}
+                    </td>
+                    <td>
+                      <div className="record-actions">
+                        {!responders && (
+                          <>
+                            <Link to={'/portal/' + item.id} aria-label={'Abrir portal de ' + nameOf(item)}>Abrir</Link>
+                            <button type="button" onClick={() => copyLink(item.id)} aria-label={'Copiar link de ' + nameOf(item)}>Copiar link</button>
+                          </>
+                        )}
+                        <Link to={'/admin/' + kind + '/edit/' + item.id} aria-label={'Editar ' + nameOf(item)}>Editar</Link>
+                        <button type="button" className="danger-link" onClick={() => askDelete(item)} aria-label={'Excluir ' + nameOf(item)}>Excluir</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+      {mode === 'demo' && !responders && <p className="workspace-note">Os links de novos pacientes ficam disponíveis nesta sessão de demonstração.</p>}
+
+      <dialog className="confirm-dialog" ref={dialog} aria-labelledby="delete-heading" onClose={() => setSelection(null)}
+        onCancel={(event) => { if (deleting) event.preventDefault(); }}>
+        <h2 id="delete-heading">Excluir cadastro?</h2>
+        <p>O cadastro de <strong>{selection?.name}</strong> será excluído.</p>
+        {deleteError && <Notice type="error">{deleteError}</Notice>}
+        <div className="confirm-actions">
+          <button className="button button-outline" onClick={() => dialog.current.close()} disabled={deleting}>Cancelar</button>
+          <button className="button button-danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Excluindo…' : 'Excluir cadastro'}</button>
+        </div>
+      </dialog>
+    </>
   );
 }
-
-export default Dashboard;
